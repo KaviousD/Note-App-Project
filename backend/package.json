@@ -11,7 +11,6 @@
   "version": "1.0.0",
   "description": "In this lab, you will learn how to create an Express.js GET route to retrieve data stored in a MongoDB database using Mongoose. You will set up an Express server, connect it to MongoDB using Mongoose, define a route to fetch NBA teams, and test the route using Thunder Client, a REST client extension for VS Code.",
   "main": "app.js",
-  "devDependencies": {},
   "scripts": {
     "start": "node --watch app.js",
     "test": "echo \"Error: no test specified\" && exit 1"

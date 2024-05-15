@@ -68,11 +68,23 @@ async function getNotes(userID) {
 }
 
 //configure a route to the base url
+
 app.get('/GET', async (req, res) => {
-    res.send(await getNotes(userID));
-    //userID here has to check data given from frontend, check for userID and throw it into the function as a variable
-    
+    notesArray = req.body // make sure this is JSON
+    userID = notesArray[0].userID // Obtain userID from request
+    try {
+        const notes = await getNotes(userID);
+        res.send(notes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching notes');
+    }
 });
+// app.get('/GET', async (req, res) => {
+//     res.send(await getNotes(userID));
+//     //userID here has to check data given from frontend, check for userID and throw it into the function as a variable
+    
+// });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +94,11 @@ app.get('/GET', async (req, res) => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // i hope you're having a lovely day :3
+//i am thank you :~>
+
+function parseNotes(body) {
+    return body.notes; 
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,28 +110,36 @@ app.get('/GET', async (req, res) => {
 // this function should try to go to the Collection named NoteDB
 // then the database with a name equal to the userID
 // could just take this routing from the function above or figure out how to do it in the URL itself
-async function saveNotes(userID) {
+async function saveNotes(userID, notes) {
     try {
+        // await mongoose.connect(URI);
+        // const NoteModel = mongoose.model(userID, Note); // Create model based on userID
+        // await NoteModel.insertMany(notes); // Save notes to database
+        // console.log('Notes saved');
+
+
         console.log(URI + '/' + userID)
         await mongoose.connect(URI + '/' + userID);
-        const person = new Note({ name: newChamp.name, role: newChamp.role });
+        const person = new Note({ title: Squid.title, id: Squid.id , category: Squid.category , description: Squid.description , date: Squid.Date , completed: Squid.Boolean , });
         // new Note({}) is a function taking the Schema specified in Schema.js
         // when you pull the data from frontend make sure the data matches the schema
         // and then figure out if new Note({}) already runs through the full array or if you gotta get fancy with it
-        await person.save().then(() => console.log('new champ saved'));
+        await person.save().then(() => console.log('notes saved'));
     } catch(e) {
-        console.log(e);
+        console.error(e);
+        throw e;
     } finally {
         await mongoose.disconnect();
     }
 }
 
 app.post('/POST', async (req, res) => {
+    const { userID} = req.body;
   try {
-    await parseNotes(req.body)
+    const parseNotes = parseNotes(req.body)
     // this will return a proper array with the notes, might not need to be a whole function
     // this function doesn't exist yet
-    await saveNotes(req.body) // figure out how to go through a whole array and fit it into a proper schema
+    await saveNotes(userID, parseNotes) // figure out how to go through a whole array and fit it into a proper schema
     // worst case: every note is parsed (fit into Mongo/Mongoose Schema) individually, then added to a new array (yet to be created), this array is then sent to mongo?
     // ideally: Schema syntax will already go through full array, or there is a seperate function for it, OR we can create a for loop/map every part of the array
     res.send('Notes Saved To Cloud');
